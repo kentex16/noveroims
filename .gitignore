@@ -1,0 +1,8 @@
+# Ignore vendor directories
+/vendor/
+
+# Ignore configuration files with sensitive information
+/config/secrets.ini
+
+# Ignore build artifacts
+/build/
