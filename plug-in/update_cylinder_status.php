@@ -16,6 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare($sql);
             $stmt->execute([$userId]);
 
+            $salesql = "UPDATE sales SET cylinder = 1 WHERE id = ?";
+            $stmt = $conn->prepare($salesql);
+            $stmt->execute([$userId]);
+
             exit(json_encode(['success' => true, 'message' => 'Cylinder returned']));
         } catch (PDOException $e) {
             exit(json_encode(['success' => false, 'message' => 'Error updating cylinder status: ' . $e->getMessage()]));

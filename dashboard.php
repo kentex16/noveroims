@@ -38,7 +38,7 @@ $username = $user['first_name'];
     .highcharts-description {
     font-size: 16px; 
     font-weight: bold; 
-    color: #333; /
+    color: #333; 
     margin-bottom: 10px; 
   
 }

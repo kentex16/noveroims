@@ -31,9 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$paymentMethod, $userId]);
 
                 // Insert a new record in the sales table with the same values
-                $insertSql = "INSERT INTO sales (name, mop, weight, amount, cylinder) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($insertSql);
-                $stmt->execute([$name, $mop, $weight, $amount, $cylinder]);
+                $updateSql = "UPDATE sales SET mop = ? WHERE id = ?";
+                $stmt = $conn->prepare($updateSql);
+                $stmt->execute([$paymentMethod, $userId]);
 
                 exit(json_encode(['success' => true, 'message' => 'Payment method updated to ' . $paymentMethod]));
             } else {
