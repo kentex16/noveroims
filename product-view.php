@@ -3,7 +3,7 @@ session_start ();
 if (!isset($_SESSION['user'])) header('location: login.php');
 $user = $_SESSION['user'];
 $SESSION['table'] = 'sales';
-$users = include ('plug-in/show-quan-user.php');
+$users = include ('plug-in/show_products.php');
 $username = $user['first_name'];
 ?>
 
@@ -14,15 +14,6 @@ $username = $user['first_name'];
 <html lang="en">
 <head>
 <title>Dashboard</title>
-<style>
-        table{
-        width:100% !important;
-        display: table !important;
-        border-collapse: collapse;
-        font-size: 12px;
-        background-color: white;
-    }
-    </style>
 <link rel="stylesheet" type= "text/css" href="css/login.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/css/bootstrap-dialog.min.css" integrity="sha512-PvZCtvQ6xGBLWHcXnyHD67NTP+a+bNrToMsIdX/NUqhw+npjLDhlMZ/PhSHZN4s9NdmuumcxKHQqbHlGVqc8ow==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script src="https://kit.fontawesome.com/4bc7e518dd.js" crossorigin="anonymous"></script>
@@ -79,72 +70,52 @@ $username = $user['first_name'];
             <div class="dashboard_topNav">
                 <a href="" title="Menu" id="toggleBtn"> <i class="fa fa-navicon"> </i> </a>
                 <a href="plug-in/logout.php" id="logoutBtn"> <i class="fa fa-power-off"> </i> Logout </a>
-                <div id="currentDateTime"></div>
-                <div id="countdown"></div>
-                <?php
-                $currentTimestamp = time();
-
-                // Add 6 hours to the current timestamp
-                $currentTimestamp += 6 * 3600; // 6 hours in seconds
-
-                $currentDateTime = date("Y-m-d H:i:s", $currentTimestamp);
-
-                echo '<script>';
-                echo 'document.getElementById("currentDateTime").textContent = "Current Date and Time   : ' . $currentDateTime . '";';
-                echo '</script>';
-            ?>
-
             </div>
             <div class="dashboard_content">
                 <div class="row">
                     <div class="column">
                     <div class="section_content">
-                        <div class="users">
+                    <div class="users">
                             <table style="margin-left: 20px;">
-                    
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Customer Name</th>
-                                        <th>Quantity Purchased</th>
-                                        
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Product Weight</th>
+                                        <th> Function </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
+                                <?php
                                         foreach ($users as $index => $user){?>
-                                            <tr>
-                                            <td> <?= $index + 1 ?> </td>
-                                            <td class="customer_name"><?= $user ['customer_name'] ?></td>
-                                            <td class="quantity_purchased"><?= $user ['quantity_purchased'] ?></td>
-                                           
+                            
+                                                <tr>
+                                                    <td><?= $index ?></td>
+                                                    <td class="product_name"><?= $user['product_name'] ?></td>
+                                                    <td class="quantity"><?= $user['quantity'] ?> </td>
+                                                    <td class="weight"><?= $user['weight'] ?></td>
+                                                    </td>
+                                                    <td>
+                                                <a href="" class="deleteUser" data-product_id = "<?= $user ['product_id'] ?>" data-product_name="<?=  $user ['product_name'] ?>" data-quantity="<?=  $user ['quantity'] ?>" 
+                                                data-weight="<?=  $user ['weight'] ?>"> <i class="fa fa-delete-left"></i> Delete
+                                                </a>
+                                            </td>
+                                                </tr>
 
-                                         </tr>
-                                    <?php } ?>
-                                   
+                                            <?php
+                                        }
+                                    
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
-                       
-                                    
                     </div>
                     </div>
                 </div>
                 </div>
-                
-                     
-            </div>
-            
-        </div>
-         
-        <form method="post" action="plug-in/retrieve-quantity.php">
-                    <button type="submit" name="retrieve">Retrieve</button>
-                    </form>
-                </ul>
             </div>
         </div>
-              
-
     </div>
     <script src="js/script.js"> </script>
     <script src="js/jquery/jquery-3.7.1.js"> </script>
@@ -157,5 +128,68 @@ $username = $user['first_name'];
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.js" integrity="sha512-AZ+KX5NScHcQKWBfRXlCtb+ckjKYLO1i10faHLPXtGacz34rhXU8KM4t77XXG/Oy9961AeLqB/5o0KTJfy2WiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    </body> 
-</html>
+    <script>
+    function Script() {
+        this.initialize = function () {
+            this.registerEvents();
+        };
+
+        this.registerEvents = function () {
+            document.addEventListener('click', function (e) {
+                targetElement = e.target;
+
+                classList = targetElement.classList;
+
+                if (classList.contains('deleteUser')) {
+                    e.preventDefault();
+                    var product_id = targetElement.dataset.product_id;
+
+                    name = targetElement.dataset.product_name;
+                    quantity = targetElement.dataset.quantity;
+                    weight = targetElement.dataset.weight;
+
+                    BootstrapDialog.confirm({
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Are you sure you want to delete ' + name + '?',
+                        callback: function (isDelete) {
+                            if (isDelete) {
+                                $.ajax({
+                                    method: 'POST',
+                                    data: {
+                                        product_id: product_id,
+                                        name: name,
+                                    },
+                                    url: 'plug-in/delete-products.php',
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if (data.success) {
+                                            BootstrapDialog.alert({
+                                                type: BootstrapDialog.TYPE_SUCCESS,
+                                                message: data.message,
+                                                callback: function () {
+                                                    location.reload();
+                                                }
+                                            });
+                                        } else {
+                                            BootstrapDialog.alert({
+                                                type: BootstrapDialog.TYPE_DANGER,
+                                                message: data.message,
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        };
+    }
+
+    // Instantiate the object and initialize it
+    var myScript = new Script();
+    myScript.initialize();
+</script>
+
+</body> 
+    </html>
