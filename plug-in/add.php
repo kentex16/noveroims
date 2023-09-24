@@ -33,6 +33,12 @@ try {
     $stmt->bindParam(10, $cylinder, PDO::PARAM_INT);
     
     $stmt->execute();
+    $stmt->closeCursor();
+
+    $updateSql = "UPDATE products SET quantity = quantity - 1 WHERE weight = ?";
+    $updateStmt = $conn->prepare($updateSql);
+    $updateStmt->bindParam(1, $weight, PDO::PARAM_STR);
+    $updateStmt->execute();
 
     $response = [
         'success' => true,

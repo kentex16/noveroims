@@ -86,6 +86,18 @@ $username = $user['first_name'];
                     <li>
                         <a href="promos.php"> <i class="fa fa-list" > </i>  <span class="menuText"> Promos </span></a>
                     </li>
+                    <li>
+                        <a href="colorgame.php"> <i class="fa fa-gamepad" > </i>  <span class="menuText"> Colorgame </span></a>
+                    </li>
+                    <li>
+                        <a href="product_add.php"> <i class="fa fa-plus" > </i>  <span class="menuText"> Product </span></a>
+                    </li>
+                    <li>
+                        <a href="product-view.php"> <i class="fa fa-plus" > </i>  <span class="menuText"> Stocks </span></a>
+                    </li>
+                    <li>
+                        <a href="show-daily.php"> <i class="fa fa-money-bill" > </i>  <span class="menuText"> Total Sales </span></a>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -3,7 +3,7 @@ session_start ();
 if (!isset($_SESSION['user'])) header('location: login.php');
 $user = $_SESSION['user'];
 $SESSION['table'] = 'sales';
-$users = include ('plug-in/show-archived.php');
+$users = include ('plug-in/show_products.php');
 $username = $user['first_name'];
 ?>
 
@@ -36,7 +36,7 @@ $username = $user['first_name'];
                 <?php endif; ?>
                 <span><?php echo $username; ?></span>
             </div>
-
+            
             <div class="dashboard_sidebar_menus">  
                 <ul class="dashboard_menu_lists">
                     <li>
@@ -80,47 +80,33 @@ $username = $user['first_name'];
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Name</th>
-                                        <th>Mop</th>
-                                        <th>Weight</th>
-                                        <th>Amount</th>
-                                        <th>Cylinder Returned?</th>
-                                        <th>Function</th>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Product Weight</th>
+                                        <th> Function </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php
-                                    $index = 0; // Initialize an index variable
-                                    foreach ($users as $user) {
-                                        // Check if the 'cylinder' field is equal to 0
-                                        if ($user['cylinder'] == 0) {
-                                            $index++; // Increment the index only for users with 'cylinder' equal to 0
-                                            ?>
-                                            <tr>
-                                                <td><?= $index ?></td>
-                                                <td class="name"><?= $user['name'] ?></td>
-                                                <td class="mop"><?= $user['mop'] ?></td>
-                                                <td class="weight"><?= $user['weight'] ?></td>
-                                                <td class="amount"><?= $user['amount'] ?></td>
-                                                <td class="cylinder">
-                                                    <?php if ($user['cylinder'] == 1): ?>
-                                                        Returned
-                                                    <?php else: ?>
-                                                        Not Returned
-                                                    <?php endif; ?>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="returnedCylinder" data-userid="<?= $user['id'] ?>">
-                                                        <i class="fa fa-gas-pump"></i> Returned
-                                                    </a>
-                                                </td>
+                                        foreach ($users as $index => $user){?>
+                            
+                                                <tr>
+                                                    <td><?= $index ?></td>
+                                                    <td class="product_name"><?= $user['product_name'] ?></td>
+                                                    <td class="quantity"><?= $user['quantity'] ?> </td>
+                                                    <td class="weight"><?= $user['weight'] ?></td>
+                                                    </td>
+                                                    <td>
+                                                <a href="" class="deleteUser" data-product_id = "<?= $user ['product_id'] ?>" data-product_name="<?=  $user ['product_name'] ?>" data-quantity="<?=  $user ['quantity'] ?>" 
+                                                data-weight="<?=  $user ['weight'] ?>"> <i class="fa fa-delete-left"></i> Delete
+                                                </a>
+                                            </td>
+                                                </tr>
 
-                                            </tr>
                                             <?php
                                         }
-                                    }
+                                    
                                     ?>
-
                                 </tbody>
                             </table>
                         </div>
@@ -131,7 +117,6 @@ $username = $user['first_name'];
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/script.js"> </script>
     <script src="js/jquery/jquery-3.7.1.js"> </script>
     <!-- Latest compiled and minified CSS -->
@@ -144,76 +129,67 @@ $username = $user['first_name'];
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.js" integrity="sha512-AZ+KX5NScHcQKWBfRXlCtb+ckjKYLO1i10faHLPXtGacz34rhXU8KM4t77XXG/Oy9961AeLqB/5o0KTJfy2WiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-    $(document).ready(function () {
-        // Handle "Returned" button click event
-        $('.returnedCylinder').click(function (e) {
-            e.preventDefault();
+    function Script() {
+        this.initialize = function () {
+            this.registerEvents();
+        };
 
-            // Get the user ID from the data attribute
-            var userId = $(this).data('userid');
-            
-            // Get the button element
-            var buttonElement = $(this);
+        this.registerEvents = function () {
+            document.addEventListener('click', function (e) {
+                targetElement = e.target;
 
-            // Prevent double-clicking by disabling the button
-            buttonElement.prop('disabled', true);
+                classList = targetElement.classList;
 
-            // Send an AJAX request to update the cylinder status
-            function updateCylinderStatus(userId, rowElement) {
-            $.ajax({
-                type: 'POST',
-                url: 'plug-in/update_cylinder_status.php',
-                data: { userId: userId },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        // Update the table cell with "Returned"
-                        $(rowElement).find('.cylinder').text('Returned');
+                if (classList.contains('deleteUser')) {
+                    e.preventDefault();
+                    var product_id = targetElement.dataset.product_id;
 
-                        // Remove the row after a delay (optional)
-                        setTimeout(function () {
-                            rowElement.fadeOut(500, function () {
-                                $(this).remove();
-                            });
-                        }, 1000); // Remove the row after 1 second (adjust as needed)
+                    name = targetElement.dataset.product_name;
+                    quantity = targetElement.dataset.quantity;
+                    weight = targetElement.dataset.weight;
 
-                        // Show a BootstrapDialog success alert
-                        BootstrapDialog.alert({
-                            type: BootstrapDialog.TYPE_SUCCESS,
-                            message: response.message,
-                        });
-                    } else {
-                        // Show a BootstrapDialog error alert
-                        BootstrapDialog.alert({
-                            type: BootstrapDialog.TYPE_DANGER,
-                            message: 'Error updating cylinder status: ' + response.message,
-                        });
-                    }
-                },
-        error: function () {
-            // Show a BootstrapDialog error alert for AJAX error
-            BootstrapDialog.alert({
-                type: BootstrapDialog.TYPE_DANGER,
-                message: 'Error updating cylinder status. Please try again later.',
+                    BootstrapDialog.confirm({
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Are you sure you want to delete ' + name + '?',
+                        callback: function (isDelete) {
+                            if (isDelete) {
+                                $.ajax({
+                                    method: 'POST',
+                                    data: {
+                                        product_id: product_id,
+                                        name: name,
+                                    },
+                                    url: 'plug-in/delete-products.php',
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if (data.success) {
+                                            BootstrapDialog.alert({
+                                                type: BootstrapDialog.TYPE_SUCCESS,
+                                                message: data.message,
+                                                callback: function () {
+                                                    location.reload();
+                                                }
+                                            });
+                                        } else {
+                                            BootstrapDialog.alert({
+                                                type: BootstrapDialog.TYPE_DANGER,
+                                                message: data.message,
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
             });
-        },
-        complete: function () {
-            // Re-enable the button when the request is complete
-            buttonElement.prop('disabled', false);
-        }
-    });
-}
+        };
+    }
 
-
-            // Get the user ID and row element
-            var rowElement = $(this).closest('tr');
-
-            // Call the updateCylinderStatus function
-            updateCylinderStatus(userId, rowElement);
-        });
-    });
+    // Instantiate the object and initialize it
+    var myScript = new Script();
+    myScript.initialize();
 </script>
 
-
-    </body> 
-</html>
+</body> 
+    </html>

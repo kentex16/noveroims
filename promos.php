@@ -66,6 +66,12 @@ $username = $user['first_name'];
                     <li>
                         <a href="promos.php"> <i class="fa fa-list" > </i>  <span class="menuText"> Promos </span></a>
                     </li>
+                    <li>
+                        <a href="product_add.php"> <i class="fa fa-plus" > </i>  <span class="menuText"> Product </span></a>
+                    </li>
+                    <li>
+                        <a href="product-view.php"> <i class="fa fa-plus" > </i>  <span class="menuText"> Stocks </span></a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -119,6 +125,8 @@ $username = $user['first_name'];
                                 </tbody>
                             </table>
                         </div>
+                       
+                                    
                     </div>
                     </div>
                 </div>
@@ -129,7 +137,9 @@ $username = $user['first_name'];
             
         </div>
          
-
+        <form method="post" action="plug-in/retrieve-quantity.php">
+                    <button type="submit" name="retrieve">Retrieve</button>
+                    </form>
                 </ul>
             </div>
         </div>

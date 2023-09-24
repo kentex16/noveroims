@@ -3,7 +3,7 @@ session_start ();
 if (!isset($_SESSION['user'])) header('location: login.php');
 $user = $_SESSION['user'];
 $SESSION['table'] = 'sales';
-$users = include ('plug-in/show-users.php');
+$users = include ('plug-in/show-sales.php');
 $username = $user['first_name'];
 ?>
 
@@ -126,12 +126,8 @@ $username = $user['first_name'];
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Name</th>
-                                        <th>Mop</th>
-                                        <th>Weight</th>
-                                        <th>Amount</th>
-                                        <th>Cylinder Returned?</th>
-                                        <th> Function </th>
+                                        <th>Sales Date</th>
+                                        <th>Total Sales</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -139,22 +135,10 @@ $username = $user['first_name'];
                                         foreach ($users as $index => $user){?>
                                             <tr>
                                             <td> <?= $index + 1 ?> </td>
-                                            <td class="name"><?= $user ['name'] ?></td>
-                                            <td class="mop"><?= $user ['mop'] ?></td>
-                                            <td class="weight"><?= $user ['weight'] ?></td>
-                                            <td class="amount"> <?= $user ['amount'] ?> </td>
-                                            <td class="cylinder">
-                                                    <?php if ($user['cylinder'] == 1): ?>
-                                                        Returned
-                                                    <?php else: ?>
-                                                        Not Returned
-                                                    <?php endif; ?>
-                                                </td>
+                                            <td class="sale_date"><?= $user ['sale_date'] ?></td>
+                                            <td class="total_sales"><?= $user ['total_sales'] ?></td>
                                             <td>
-                                                <a href="" class="updateUser" data-userid = "<?= $user ['id'] ?>" > <i class="fa fa-pencil"></i> Edit </a>
-                                                <a href="" class="deleteUser" data-userid = "<?= $user ['id'] ?>" data-name="<?=  $user ['name'] ?>" data-mop="<?=  $user ['mop'] ?>" 
-                                                data-weight="<?=  $user ['weight'] ?>" data-amount ="<?=  $user ['amount'] ?>"data-cylinder="<?=  $user ['cylinder'] ?>"> <i class="fa fa-delete-left"></i> Delete
-                                                </a>
+                                            
                                             </td>
 
                                          </tr>
@@ -168,7 +152,7 @@ $username = $user['first_name'];
                 </div>
                 </div>
                 
-                <button id="calculateTotalAmount" class="btn btn-primary" style ="margin-left:20px;">Calculate Total Amount</button>
+                
               
 
             </div>
@@ -185,12 +169,6 @@ $username = $user['first_name'];
                     <button class="export-excel">Export as XLS</button>
                     <button class="fullscreen">View Fullscreen</button>
                     <button class="print">Print Table</button>
-                    <form method="post" action="plug-in/reset_database.php">
-                    <button type="submit" class="btn btn-danger" name="reset" style="margin-left: 20px;">Reset Database</button>
-                    </form>
-                    <form method="post" action="plug-in/process_sales_summary.php">
-                    <button type="submit" id="clearTable" name="generate_summary">Generate Sales Summary</button>
-                    </form>
                                             
                 
 
@@ -201,198 +179,7 @@ $username = $user['first_name'];
 
     </div>
     <script src="js/script.js"> </script>
-    <script src="js/jquery/jquery-3.7.1.js"> </script>
-    <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.35.4/js/bootstrap-dialog.js" integrity="sha512-AZ+KX5NScHcQKWBfRXlCtb+ckjKYLO1i10faHLPXtGacz34rhXU8KM4t77XXG/Oy9961AeLqB/5o0KTJfy2WiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <script>
-        function script (){
-            this.initialize = function (){
-                this.registerEvents();
-            },
-
-            this.registerEvents =function (){
-                document.addEventListener('click', function(e){
-                    targetElement = e.target;
-
-                    classList = targetElement.classList;
-
-
-
-                    if(classList.contains('deleteUser')){
-                        e.preventDefault();
-                        userId = targetElement.dataset.userid;
-                        name = targetElement.dataset.name;
-                        mop = targetElement.dataset.mop;
-                        weight=targetElement.dataset.weight;
-                        amount=targetElement.dataset.amount;
-                        cylinder=targetElement.datasetcylinder;
-                        
-
-                        BootstrapDialog.confirm({
-                            type:BootstrapDialog.TYPE_DANGER,
-                            message: 'Are you sure you want to delete ' + name + '?',
-                            callback:function(isDelete){
-                                    if (isDelete){
-                                        $.ajax({
-                                        method: 'POST',
-                                        data: {
-                                            user_id:userId,
-                                            name: name,
-                                        },
-                                        url: 'plug-in/delete-user.php', 
-                                        dataType: 'json',
-                                        success: function(data){
-                                            if (data.success){
-                                            BootstrapDialog.alert({
-                                                type: BootstrapDialog.TYPE_SUCCESS,
-                                                message: data.message,
-                                                callback: function(){
-                                                    location.reload();
-                                                }
-                                            });
-                                        } else  BootstrapDialog.alert({
-                                                type: BootstrapDialog.TYPE_DANGER,
-                                                message: data.message,
-                                            });
-                                            
-                                        }
-                                    });
-
-                                    }
-                                        
-                                }
-                            })
-
-                        }
-                
-                   
-                    if(classList.contains('updateUser')){
-                        e.preventDefault();
-                        
-                       userId = targetElement.dataset.userid;
-                       name = targetElement.closest('tr').querySelector('td.name').innerHTML;
-                       mop =targetElement.closest('tr').querySelector('td.mop').innerHTML;
-                       weight =targetElement.closest('tr').querySelector('td.weight').innerHTML;
-                       amount =targetElement.closest('tr').querySelector('td.amount').innerHTML;
-                       cylinder =targetElement.closest('tr').querySelector('td.cylinder').innerHTML;
-
-                    BootstrapDialog.confirm({
-                        title: 'Update now ' + name,
-                                        message: '<form>\
-                    <div class="form-group">\
-                        <label for="name">Name</label>\
-                        <input type="text" class="form-control" id="name" value="' + name + '">\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="mop">MOP</label>\
-                        <select id="mop" class="form-control" value="' + mop + '">\
-                            <option value="' + mop + '">' + mop + '</option>\
-                            <option value="Cash">Cash</option>\
-                            <option value="Gcash">Gcash</option>\
-                            <option value="Credit">Credit</option>\
-                        </select>\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="weight">Weight</label>\
-                        <select id="weight" class="form-control" value="' + weight + '">\
-                            <option value="' + weight + '">' + weight + '</option>\
-                            <option value="2.7kg">2.7kg</option>\
-                            <option value="11kg">11kg</option>\
-                            <option value="22kg">22kg</option>\
-                        </select>\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="amount">Amount</label>\
-                        <input type="text" class="form-control" id="amount" value="' + amount + '"/>\
-                    </div>\
-                    <div class="form-group">\
-                        <label for="cylinder">Returned Cylinder?</label>\
-                        <input type="checkbox" class="form-control" id="cylinder" value="' + cylinder + '"/>\
-                    </div>\
-                </form>',
-                    callback: function (isUpdate){
-                        if(isUpdate){
-                            $.ajax({
-                                method: 'POST',
-                                data: {
-                                    userId:userId,
-                                    name: document.getElementById('name').value,
-                                    mop: document.getElementById('mop').value,
-                                    weight: document.getElementById('weight').value,
-                                    amount: document.getElementById('amount').value,
-                                    cylinder: document.getElementById('cylinder').checked ? 1: 0,
-                                    
-                                },
-                                url: 'plug-in/update-user.php', 
-                                dataType: 'json',
-                                success: function(data){
-                                    if (data.success){
-                                        BootstrapDialog.alert({
-                                            type: BootstrapDialog.TYPE_SUCCESS,
-                                            message: data.message,
-                                            callback: function(){
-                                                location.reload();
-                                            }
-                                        });
-                                    } else  BootstrapDialog.alert({
-                                            type: BootstrapDialog.TYPE_DANGER,
-                                            message: data.message,
-                                        });
-                                    
-                                }
-                            })
-                        } 
-                    }
-
-                    });
-                    
-                    }
-                });
-            }
-        }
-        document.getElementById('calculateTotalAmount').addEventListener('click', function (e) {
-            e.preventDefault();
-            calculateTotalAmount();
-        });
-
-        // Function to calculate the total amount
-        function calculateTotalAmount() {
-            var totalAmount = 0;
-
-            // Iterate through the rows and calculate the total amount
-            document.querySelectorAll('table tbody tr').forEach(function (row) {
-                var mop = row.querySelector('td.mop').textContent;
-                var amount = parseFloat(row.querySelector('td.amount').textContent);
-
-                if (mop !== 'Credit' && !isNaN(amount)) {
-                    totalAmount += amount;
-                }
-            });
-
-            // Display the total amount
-            BootstrapDialog.alert({
-                type: BootstrapDialog.TYPE_INFO,
-                message: 'Today Sale: ₱' + totalAmount.toFixed(2),
-            });
-        }
-        
-
-        var script = new script;
-        script.initialize();
-    </script>
-
-
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
 
@@ -535,5 +322,5 @@ function resetDatabase() {
 }
 
 </script>
-</body> 
-</html>
+    </body>
+    </html>
